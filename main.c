@@ -40,7 +40,8 @@
 #include<avr/io.h>
 #include<util/delay.h>
 
-//outpust values for different characters
+// output values for different characters
+// port A
 const uint8_t charactersA[16] = {
 		0b00000000,	// 0
 		0b00000010,	// 1
@@ -59,6 +60,7 @@ const uint8_t charactersA[16] = {
 		0b00000000,	// E
 		0b00000010	// F
 };
+// port B
 const uint8_t charactersB[16] = {
 		0b01000000,	// 0
 		0b01100100,	// 1
@@ -77,6 +79,7 @@ const uint8_t charactersB[16] = {
 		0b10010000,	// E
 		0b10010000	// F
 };
+// port D
 const uint8_t charactersD[16] = {
 		0b00010000,	// 0
 		0b00010100,	// 1
@@ -96,6 +99,7 @@ const uint8_t charactersD[16] = {
 		0b00010000,	// F
 };
 
+// the 4 digits of the display
 int arr[4] = {0x0,0x0,0x0,0x0};
 
 void disp(){
@@ -126,15 +130,16 @@ uint8_t key_pressed (volatile uint8_t *inputreg, uint8_t inputbit)
 	static uint8_t last_state = 0;
 
 	if (last_state == (*inputreg & (1<<inputbit)))
-		return 0; /* keine Änderung */
+		return 0; // no change
 
-	/* Zustand für nächsten Aufruf merken: */
+	// remeber state for next call of the function
 	last_state = *inputreg & (1<<inputbit);
 
-	/* und den entprellten Tastendruck zurückgeben: */
+	// return proper keypress
 	return *inputreg & (1<<inputbit);
 }
 
+// turn a given value into a certain format (e.g. format(42, 2) -> 10101) and write it into an array
 void format(uint16_t value, int format){
 	int r = 0,
 		c = 3;
@@ -153,19 +158,19 @@ int main(void){
 	DDRD = 0b00111111;
 
 
+	// sample program counting clicks in decimal format
 
 	uint16_t count = 0;
 
-
 	while(1){
+		// check if Pin D6 is pressed
 		if(key_pressed(&PIND, PD6)){
 			count++;
 		}
-
+		// turn the counter into the right format
 		format(count, 10);
-
+		// refresh the display
 		disp();
+		_delay_ms(10);
 	}
-
-	_delay_ms(10);
 }
