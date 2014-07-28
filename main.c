@@ -43,85 +43,82 @@
 // output values for different characters
 // port A
 const uint8_t charactersA[16] = {
-		0b00000000,	// 0
-		0b00000010,	// 1
-		0b00000000,	// 2
-		0b00000000,	// 3
-		0b00000010,	// 4
-		0b00000000,	// 5
-		0b00000000,	// 6
-		0b00000010,	// 7
-		0b00000000,	// 8
-		0b00000000,	// 9
-		0b00000010,	// A
-		0b00000000,	// b
-		0b00000000,	// C
-		0b00000000,	// d
-		0b00000000,	// E
-		0b00000010	// F
+	0b00000000,	// 0
+	0b00000010,	// 1
+	0b00000000,	// 2
+	0b00000000,	// 3
+	0b00000010,	// 4
+	0b00000000,	// 5
+	0b00000000,	// 6
+	0b00000010,	// 7
+	0b00000000,	// 8
+	0b00000000,	// 9
+	0b00000010,	// A
+	0b00000000,	// b
+	0b00000000,	// C
+	0b00000000,	// d
+	0b00000000,	// E
+	0b00000010	// F
 };
 // port B
 const uint8_t charactersB[16] = {
-		0b01000000,	// 0
-		0b01100100,	// 1
-		0b00010100,	// 2
-		0b00000100, // 3
-		0b00100000,	// 4
-		0b10000000,	// 5
-		0b10000000,	// 6
-		0b01000100,	// 7
-		0b00000000,	// 8
-		0b00000000,	// 9
-		0b00000000,	// A
-		0b10100000,	// b
-		0b11010000,	// C
-		0b00100100,	// d
-		0b10010000,	// E
-		0b10010000	// F
+	0b01000000,	// 0
+	0b01100100,	// 1
+	0b00010100,	// 2
+	0b00000100, 	// 3
+	0b00100000,	// 4
+	0b10000000,	// 5
+	0b10000000,	// 6
+	0b01000100,	// 7
+	0b00000000,	// 8
+	0b00000000,	// 9
+	0b00000000,	// A
+	0b10100000,	// b
+	0b11010000,	// C
+	0b00100100,	// d
+	0b10010000,	// E
+	0b10010000	// F
 };
 // port D
 const uint8_t charactersD[16] = {
-		0b00010000,	// 0
-		0b00010100,	// 1
-		0b00010000,	// 2
-		0b00010100,	// 3
-		0b00010100,	// 4
-		0b00010100,	// 5
-		0b00010000,	// 6
-		0b00010100,	// 7
-		0b00010000,	// 8
-		0b00010100,	// 9
-		0b00010000,	// A
-		0b00010000,	// b
-		0b00010000,	// C
-		0b00010000,	// d
-		0b00010000,	// E
-		0b00010000,	// F
+	0b00010000,	// 0
+	0b00010100,	// 1
+	0b00010000,	// 2
+	0b00010100,	// 3
+	0b00010100,	// 4
+	0b00010100,	// 5
+	0b00010000,	// 6
+	0b00010100,	// 7
+	0b00010000,	// 8
+	0b00010100,	// 9
+	0b00010000,	// A
+	0b00010000,	// b
+	0b00010000,	// C
+	0b00010000,	// d
+	0b00010000,	// E
+	0b00010000	// F
 };
 
 // the 4 digits of the display
-int arr[4] = {0x0,0x0,0x0,0x0};
+// this is want actually will be displayed
+int digit_arr[4] = {0x0,0x0,0x0,0x0};
 
 void disp(){
+	// each member of the array represents one pin on
+	// wich is connected to one of the common cathodes/anodes of the digits
+	pin_arr[4] = {
+		0b00000001,	// pin 0
+		0b00000010,	// pin 1
+		0b00001000,	// pin 3
+		0b00100000	// pin 5
+	};
 	for(int i = 0; i < 4; i++){
 		PORTD = 0x00;
-		PORTA = charactersA[arr[i]];
-		PORTB = charactersB[arr[i]];
-		PORTD = charactersD[arr[i]];
-		switch(i){
-		case 0:
-			PORTD |= 0b00000001;
-			break;
-		case 1:
-			PORTD |= 0b00000010;
-			break;
-		case 2:
-			PORTD |= 0b00001000;
-			break;
-		case 3:
-			PORTD |= 0b00100000;
-			break;
-		}
+		PORTA = charactersA[digit_arr[i]];
+		PORTB = charactersB[digit_arr[i]];
+		PORTD = charactersD[digit_arr[i]];
+		// turn on each one of the common pins one after another
+		PORTD |= pin_arr[i];
 	}
 }
 
@@ -146,7 +143,7 @@ void format(uint16_t value, int format){
 	while(value > 0){
 		r = value % format;
 		value = (int)value / format;
-		arr[c] = r;
+		digit_arr[c] = r;
 		c--;
 	}
 }
